@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AtumPlayy - Entretenimento Digital Premium</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #1e40af;
+            --accent: #f59e0b;
+            --dark: #1f2937;
+            --light: #f3f4f6;
+            --gray: #9ca3af;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            color: #333;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header */
+        header {
+            background: linear-gradient(to right, var(--dark), var(--primary));
+            color: white;
+            padding: 20px 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: lefth;
+            gap: 10px;
+            width: 80px;
+            height: 80px;
+            display: flex;
+        }
+        
+        .logo-placeholder {
+            width: 50px;
+            height: 50px;
+            background-color: var(--accent);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 20px;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        nav a:hover {
+            color: var(--accent);
+        }
+        
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1500&q=80');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 160px 0 100px;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 30px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: all 0.3s;
+            margin: 10px;
+        }
+        
+        .btn-primary {
+            background-color: var(--accent);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #e69008;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .btn-secondary {
+            background-color: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: white;
+            color: var(--dark);
+            transform: translateY(-3px);
+        }
+        
+        /* Features */
+        .features {
+            padding: 100px 0;
+            background-color: var(--light);
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        .section-title h2 {
+            font-size: 2.5rem;
+            color: var(--dark);
+            margin-bottom: 20px;
+        }
+        
+        .section-title p {
+            color: var(--gray);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .feature-card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+        
+        .feature-card h3 {
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+        
+        /* Pricing */
+        .pricing {
+            padding: 100px 0;
+        }
+        
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+        
+        .pricing-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            text-align: center;
+            transition: transform 0.3s;
+            position: relative;
+        }
+        
+        .pricing-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .pricing-header {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            padding: 30px 20px;
+        }
+        
+        .pricing-price {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .pricing-period {
+            font-size: 0.9rem;
+        }
+        
+        .pricing-features {
+            padding: 30px;
+        }
+        
+        .pricing-features ul {
+            list-style: none;
+            margin-bottom: 30px;
+        }
+        
+        .pricing-features li {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .pricing-features li:last-child {
+            border-bottom: none;
+        }
+        
+        /* FAQ */
+        .faq {
+            padding: 100px 0;
+            background-color: var(--light);
+        }
+        
+        .accordion {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .accordion-item {
+            background: white;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        .accordion-header {
+            padding: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+        }
+        
+        .accordion-content {
+            padding: 0 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s, padding 0.3s;
+        }
+        
+        .accordion-content.active {
+            padding: 20px;
+            max-height: 300px;
+        }
+        
+        /* Reseller */
+        .reseller {
+            padding: 100px 0;
+            text-align: center;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+        }
+        
+        /* Footer */
+        footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 50px 0 20px;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .footer-logo {
+            margin-bottom: 20px;
+        }
+        
+        .footer-social {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .footer-social a {
+            color: white;
+            font-size: 1.5rem;
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            nav ul {
+                gap: 15px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-content">
+            <div class="logo">
+                <div class=" "></div>
+                <img src="logo1.png" alt="AtumPlayy" class="logo-img">
+                <h2>AtumPlayy</h2>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#features">Vantagens</a></li>
+                    <li><a href="#pricing">Planos</a></li>
+                    <li><a href="#faq">Dúvidas</a></li>
+                    <li><a href="#reseller">Revenda</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>Entretenimento Digital de Alta Qualidade</h1>
+            <p>Desfrute de milhares de canais, filmes e séries com a melhor tecnologia de streaming do mercado. Tudo em um só lugar, a qualquer hora.</p>
+            <a href="#pricing" class="btn btn-primary">Experimente Grátis</a>
+            <a href="#reseller" class="btn btn-secondary">Seja um Revendedor</a>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-title">
+                <h2>Por que escolher a AtumPlayy?</h2>
+                <p>Oferecemos a melhor experiência em entretenimento digital para você e sua família</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-tv"></i>
+                    </div>
+                    <h3>Conteúdo Premium</h3>
+                    <p>Acesso a milhares de canais nacionais e internacionais, incluindo os melhores eventos esportivos e filmes lançamentos.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3>Multiplataforma</h3>
+                    <p>Assista em qualquer dispositivo: Smart TV, Android, iOS, Computador, Tablet e muito mais.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-broadcast-tower"></i>
+                    </div>
+                    <h3>Alta Definição</h3>
+                    <p>Transmissão em Full HD, 4K e som surround para uma experiência cinematográfica em sua casa.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing -->
+    <section class="pricing" id="pricing">
+        <div class="container">
+            <div class="section-title">
+                <h2>Planos e Preços</h2>
+                <p>Escolha o plano ideal para o seu entretenimento</p>
+            </div>
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3>Plano Mensal</h3>
+                        <div class="pricing-price">R$ 30</div>
+                        <div class="pricing-period">por mês</div>
+                    </div>
+                    <div class="pricing-features">
+                        <ul>
+                            <li>+10.000 Canais</li>
+                            <li>+30.000 Filmes/Séries</li>
+                            <li>Suporte 24/7</li>
+                            <li>Qualidade Full HD/4K</li>
+                        </ul>
+                        <a href="https://wa.me/5511970186850" class="btn btn-primary">Teste Grátis</a>
+                    </div>
+                </div>
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3>Plano Trimestral</h3>
+                        <div class="pricing-price">R$ 75</div>
+                        <div class="pricing-period">por mês</div>
+                    </div>
+                    <div class="pricing-features">
+                        <ul>
+                            <li>+10.000 Canais</li>
+                            <li>+30.000 Filmes/Séries</li>
+                            <li>Suporte 24/7</li>
+                            <li>Qualidade Full HD/4K</li>
+                            <li>Economize 17%</li>
+                        </ul>
+                        <a href="https://wa.me/5511970186850" class="btn btn-primary">Teste Grátis</a>
+                    </div>
+                </div>
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3>Plano Semestral</h3>
+                        <div class="pricing-price">R$ 120</div>
+                        <div class="pricing-period">pagamento único</div>
+                    </div>
+                    <div class="pricing-features">
+                        <ul>
+                            <li>+10.000 Canais</li>
+                            <li>+30.000 Filmes/Séries</li>
+                            <li>Suporte Prioritário</li>
+                            <li>Qualidade Full HD/4K</li>
+                            <li>Economize 33%</li>
+                        </ul>
+                        <a href="https://wa.me/5511970186850" class="btn btn-primary">Teste Grátis</a>
+                    </div>
+                </div>
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3>Plano Anual</h3>
+                        <div class="pricing-price">R$ 180</div>
+                        <div class="pricing-period">pagamento único</div>
+                    </div>
+                    <div class="pricing-features">
+                        <ul>
+                            <li>+10.000 Canais</li>
+                            <li>+30.000 Filmes/Séries</li>
+                            <li>Suporte Prioritário</li>
+                            <li>Qualidade Full HD/4K</li>
+                            <li>Economize 50%</li>
+                        </ul>
+                        <a href="https://wa.me/5511970186850" class="btn btn-primary">Teste Grátis</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="faq" id="faq">
+        <div class="container">
+            <div class="section-title">
+                <h2>Perguntas Frequentes</h2>
+                <p>Tire suas dúvidas sobre nosso serviço de entretenimento digital</p>
+            </div>
+            <div class="accordion">
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <span>Como posso assinar o serviço?</span>
+                        <i class="fas fa-plus"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <p>É muito simples! Basta clicar em qualquer botão "Teste Grátis" em nossa página, preencher seus dados e seguir as instruções para configurar em seu dispositivo preferido.</p>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <span>Em quais dispositivos funciona?</span>
+                        <i class="fas fa-plus"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <p>Nosso serviço é compatível com a maioria dos dispositivos: Smart TVs (Samsung, LG, Android TV), dispositivos com Android e iOS, computadores, tablets, Amazon Fire Stick, Mi Box e muito mais.</p>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <span>Preciso de internet rápida?</span>
+                        <i class="fas fa-plus"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <p>Recomendamos uma conexão de pelo menos 15 Mbps para transmissão em HD e 25 Mbps para conteúdo em 4K. Quanto melhor sua internet, mais estável será sua experiência.</p>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <span>Como funciona o teste gratuito?</span>
+                        <i class="fas fa-plus"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <p>Oferecemos um período de teste para que você possa experimentar nossa plataforma e ver a qualidade do nosso conteúdo antes de assinar qualquer plano. Não requer cartão de crédito!</p>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <span>O serviço tem fidelidade?</span>
+                        <i class="fas fa-plus"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <p>Não! Todos os nossos planos são sem fidelidade. Você pode cancelar a qualquer momento sem taxas adicionais ou multas.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Reseller -->
+    <section class="reseller" id="reseller">
+        <div class="container">
+            <div class="section-title">
+                <h2>Seja um Revendedor</h2>
+                <p>Transforme sua rede de contatos em uma oportunidade de negócio</p>
+            </div>
+            <p>Junte-se à nossa rede de revendedores e ofereça o melhor serviço de entretenimento digital do mercado. Tenha lucros atraentes e suporte completo para seu negócio.</p>
+            <div style="margin-top: 40px;">
+                <a href="https://wa.me/5511970186850?text=Quero%20ser%20um%20revendedor" class="btn btn-secondary" target="_blank">Entre em Contato</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div>
+                    <div class="logo footer-logo">
+                        <img src="logo1.png" alt="AtumPlayy" class="footer-logo-img">
+                        <div class=""></div>
+                        <h2>AtumPlayy</h2>
+                    </div>
+                    <p>Oferecendo a melhor experiência em entretenimento digital para todo o Brasil.</p>
+                    <div class="footer-social">
+                        <a href="https://wa.me/5511970186850"><i class="fab fa-whatsapp"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="https://t.me/+ZhapEmImLIMyM2Ex"><i class="fab fa-telegram"></i></a>
+                    </div>
+                </div>
+                <div>
+                    <h3>Links Rápidos</h3>
+                    <ul>
+                        <li><a href="#features">Vantagens</a></li>
+                        <li><a href="#pricing">Planos</a></li>
+                        <li><a href="#faq">Dúvidas</a></li>
+                        <li><a href="#reseller">Revenda</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Contato</h3>
+                    <p>Email: r33x.crypt@gmail.com</p>
+                    <p>WhatsApp: (11) 97018-6850</p>
+                    <p>Telegram: @wordUHD</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 AtumPlayy - Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Accordion FAQ
+        document.querySelectorAll('.accordion-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const content = header.nextElementSibling;
+                const icon = header.querySelector('i');
+                
+                content.classList.toggle('active');
+                
+                if (content.classList.contains('active')) {
+                    icon.classList.remove('fa-plus');
+                    icon.classList.add('fa-minus');
+                } else {
+                    icon.classList.remove('fa-minus');
+                    icon.classList.add('fa-plus');
+                }
+            });
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 100,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
