@@ -61,9 +61,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const title = type === 'movie' ? item.title : item.name;
         const year = (item.release_date || item.first_air_date || '').slice(0, 4);
         const rating = item.vote_average ? item.vote_average.toFixed(1) : '—';
-        const href = `https://wa.me/${WHATSAPP_NUM}?text=${encodeURIComponent(`Quero assistir "${title}" agora`)}`;
         return `
-            <a href="${href}" target="_blank" rel="noopener" class="movie-card" title="${title}">
+            <button class="movie-card cta-chatbot" title="${title}" data-movie="${title}">
                 <img src="${IMG_BASE}${item.poster_path}" alt="Pôster de ${title}" loading="lazy" />
                 <span class="rating">${rating}</span>
                 <div class="overlay">
@@ -74,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                     </div>
                 </div>
-            </a>`;
+            </button>`;
     }
 
     function renderCards(items, type) {
@@ -127,10 +126,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const FLOW = [
             {
                 id: 'greeting',
-                messages: [
-                    'E aí! 👋 Quer testar a StreamPlay grátis?',
-                    'É rapidinho, só preciso de algumas informações pra liberar seu acesso. Bora?'
-                ],
+                messages: () => {
+                    if (leadData.filme) {
+                        return [
+                            `Vi que você curte "${leadData.filme}"! 🍿`,
+                            'Quer testar a StreamPlay grátis pra assistir isso e muito mais?',
+                            'É rapidinho, só preciso de algumas informações. Bora?'
+                        ];
+                    }
+                    return [
+                        'E aí! 👋 Quer testar a StreamPlay grátis?',
+                        'É rapidinho, só preciso de algumas informações pra liberar seu acesso. Bora?'
+                    ];
+                },
                 type: 'options',
                 options: [{ label: 'Bora! 🚀', value: 'bora' }],
                 next: () => 1
@@ -394,7 +402,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (step.type === 'loading') { await showLoading(); return; }
             if (step.type === 'success') { showSuccess(); return; }
 
-            if (step.messages.length) await botSay(step.messages);
+            const msgs = typeof step.messages === 'function' ? step.messages() : step.messages;
+            if (msgs && msgs.length) await botSay(msgs);
             await delay(300);
 
             if (step.type === 'options') showOptions(step.options);
@@ -455,6 +464,9 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.cta-chatbot').forEach(btn => {
                 btn.addEventListener('click', e => {
                     e.preventDefault();
+                    // if clicked from a movie card, pass the movie name
+                    const movie = btn.dataset.movie;
+                    if (movie) leadData.filme = movie;
                     open();
                 });
             });
