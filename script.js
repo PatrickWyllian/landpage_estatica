@@ -106,6 +106,365 @@ document.addEventListener('DOMContentLoaded', () => {
         track.innerHTML = `<p style="text-align:center;color:var(--text-muted);padding:40px 0;width:100%;">Token TMDB expirado. Atualize o token.</p>`;
     }
 
+    /* ============================================================
+       CHATBOT MODULE
+       ============================================================ */
+    const WEBHOOK_URL = 'https://SEU-N8N-AQUI.com/webhook/chatbot-streamplay';
+
+    const ChatBot = (() => {
+        const $panel    = document.getElementById('chatbot-panel');
+        const $overlay  = document.getElementById('chatbot-overlay');
+        const $messages = document.getElementById('chatbot-messages');
+        const $input    = document.getElementById('chatbot-input-area');
+        const $fab      = document.getElementById('chatbot-open');
+        const $closeBtn = document.getElementById('chatbot-close');
+
+        let state = 0;
+        let leadData = {};
+        let isOpen = false;
+        let isTyping = false;
+
+        const FLOW = [
+            {
+                id: 'greeting',
+                messages: [
+                    'E aí! 👋 Quer testar a StreamPlay grátis?',
+                    'É rapidinho, só preciso de algumas informações pra liberar seu acesso. Bora?'
+                ],
+                type: 'options',
+                options: [{ label: 'Bora! 🚀', value: 'bora' }],
+                next: () => 1
+            },
+            {
+                id: 'device',
+                messages: [
+                    'Pra gente garantir que funciona bem pra você... 😊',
+                    'Você tem Smart TV, Fire Stick, TV Box ou Chromecast?'
+                ],
+                type: 'options',
+                options: [
+                    { label: 'Smart TV', value: 'Smart TV' },
+                    { label: 'Fire Stick', value: 'Fire Stick' },
+                    { label: 'TV Box', value: 'TV Box' },
+                    { label: 'Chromecast', value: 'Chromecast' },
+                    { label: 'Nenhum desses', value: 'outro' }
+                ],
+                field: 'dispositivo',
+                next: () => 2
+            },
+            {
+                id: 'preference',
+                messages: ['E o que você mais gosta de assistir?'],
+                type: 'options',
+                options: [
+                    { label: 'Filmes', value: 'Filmes' },
+                    { label: 'Séries', value: 'Séries' },
+                    { label: 'Esportes', value: 'Esportes' },
+                    { label: 'Tudo!', value: 'Tudo' }
+                ],
+                field: 'preferencia',
+                next: () => 3
+            },
+            {
+                id: 'name',
+                messages: ['Beleza! Só preciso do seu nome pra gente personalizar:'],
+                type: 'input',
+                placeholder: 'Seu nome',
+                field: 'nome',
+                next: () => 4
+            },
+            {
+                id: 'whatsapp',
+                messages: ['Agora me passa seu WhatsApp que vou mandar o acesso:'],
+                type: 'input',
+                placeholder: '(11) 99999-9999',
+                field: 'whatsapp',
+                next: () => 5
+            },
+            {
+                id: 'email',
+                messages: ['Por último, seu email pra confirmar:'],
+                type: 'input',
+                placeholder: 'seu@email.com',
+                field: 'email',
+                next: () => 6
+            },
+            {
+                id: 'loading',
+                messages: [],
+                type: 'loading'
+            },
+            {
+                id: 'success',
+                messages: [],
+                type: 'success'
+            }
+        ];
+
+        /* -- helpers -- */
+        function save()   { sessionStorage.setItem('chatbot_state', JSON.stringify({ state, leadData })); }
+        function clear()  { sessionStorage.removeItem('chatbot_state'); }
+
+        function scrollToBottom() {
+            $messages.scrollTop = $messages.scrollHeight;
+        }
+
+        function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+        /* -- renderers -- */
+        function addBotMsg(text) {
+            return new Promise(resolve => {
+                const bubble = document.createElement('div');
+                bubble.className = 'chatbot-msg bot';
+                bubble.textContent = text;
+                $messages.appendChild(bubble);
+                scrollToBottom();
+                resolve();
+            });
+        }
+
+        async function botSay(texts) {
+            for (const t of texts) {
+                showTyping();
+                await delay(800 + Math.random() * 600);
+                hideTyping();
+                await addBotMsg(t);
+                await delay(200);
+            }
+        }
+
+        function addUserMsg(text) {
+            const bubble = document.createElement('div');
+            bubble.className = 'chatbot-msg user';
+            bubble.textContent = text;
+            $messages.appendChild(bubble);
+            scrollToBottom();
+        }
+
+        function showTyping() {
+            if (isTyping) return;
+            isTyping = true;
+            const el = document.createElement('div');
+            el.className = 'chatbot-typing';
+            el.id = 'typing-indicator';
+            el.innerHTML = '<span></span><span></span><span></span>';
+            $messages.appendChild(el);
+            scrollToBottom();
+        }
+
+        function hideTyping() {
+            isTyping = false;
+            const el = document.getElementById('typing-indicator');
+            if (el) el.remove();
+        }
+
+        function showOptions(options) {
+            $input.innerHTML = '';
+            const wrap = document.createElement('div');
+            wrap.className = 'chatbot-options';
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'chatbot-option';
+                btn.textContent = opt.label;
+                btn.addEventListener('click', () => {
+                    addUserMsg(opt.label);
+                    wrap.remove();
+                    $input.innerHTML = '';
+                    if (FLOW[state].field) {
+                        leadData[FLOW[state].field] = opt.value;
+                        save();
+                    }
+                    state = FLOW[state].next();
+                    save();
+                    runStep();
+                });
+                wrap.appendChild(btn);
+            });
+            $input.appendChild(wrap);
+        }
+
+        function showInput(placeholder) {
+            $input.innerHTML = '';
+            const row = document.createElement('div');
+            row.className = 'chatbot-input-row';
+
+            const inp = document.createElement('input');
+            inp.type = 'text';
+            inp.className = 'chatbot-input';
+            inp.placeholder = placeholder;
+            inp.autocomplete = 'off';
+
+            const btn = document.createElement('button');
+            btn.className = 'chatbot-send';
+            btn.disabled = true;
+            btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>';
+
+            function submit() {
+                const val = inp.value.trim();
+                if (!val) return;
+                addUserMsg(val);
+                $input.innerHTML = '';
+                if (FLOW[state].field) {
+                    leadData[FLOW[state].field] = val;
+                    save();
+                }
+                state = FLOW[state].next();
+                save();
+                runStep();
+            }
+
+            inp.addEventListener('input', () => { btn.disabled = !inp.value.trim(); });
+            inp.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
+            btn.addEventListener('click', submit);
+
+            row.appendChild(inp);
+            row.appendChild(btn);
+            $input.appendChild(row);
+            inp.focus();
+        }
+
+        async function showLoading() {
+            $input.innerHTML = '';
+            const el = document.createElement('div');
+            el.className = 'chatbot-loading';
+            const phrases = [
+                'Verificando disponibilidade...',
+                'Preparando seu acesso...',
+                'Quase lá...'
+            ];
+            el.innerHTML = `
+                <div class="chatbot-spinner"></div>
+                <div class="chatbot-loading-text">${phrases[0]}</div>
+            `;
+            $messages.appendChild(el);
+            scrollToBottom();
+
+            for (let i = 1; i < phrases.length; i++) {
+                await delay(1200);
+                el.querySelector('.chatbot-loading-text').textContent = phrases[i];
+            }
+            await delay(1000);
+            el.remove();
+
+            // send to webhook
+            sendToWebhook();
+
+            // show success
+            state = 8;
+            runStep();
+        }
+
+        function showSuccess() {
+            const el = document.createElement('div');
+            el.className = 'chatbot-success';
+            el.innerHTML = `
+                <div class="chatbot-success-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+                <h4>Pronto!</h4>
+                <p>Seu teste grátis chegará no seu WhatsApp em instantes. Fique de olho! 📲</p>
+            `;
+            $messages.appendChild(el);
+            scrollToBottom();
+            clear();
+        }
+
+        function sendToWebhook() {
+            const payload = {
+                ...leadData,
+                origem: 'landing_page',
+                timestamp: new Date().toISOString()
+            };
+            if (WEBHOOK_URL.includes('SEU-N8N')) {
+                console.log('[Chatbot] Webhook placeholder — dados:', payload);
+                return;
+            }
+            fetch(WEBHOOK_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).catch(err => console.error('[Chatbot] Webhook error:', err));
+        }
+
+        /* -- flow engine -- */
+        async function runStep() {
+            if (state >= FLOW.length) return;
+            const step = FLOW[state];
+
+            if (step.type === 'loading') { await showLoading(); return; }
+            if (step.type === 'success') { showSuccess(); return; }
+
+            if (step.messages.length) await botSay(step.messages);
+            await delay(300);
+
+            if (step.type === 'options') showOptions(step.options);
+            else if (step.type === 'input') showInput(step.placeholder);
+        }
+
+        /* -- open / close -- */
+        function open() {
+            if (isOpen) return;
+            isOpen = true;
+            $panel.classList.add('open');
+            $overlay.classList.add('active');
+            $fab.classList.add('open');
+            document.body.style.overflow = 'hidden';
+
+            // resume or start fresh
+            const saved = sessionStorage.getItem('chatbot_state');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                state = parsed.state;
+                leadData = parsed.leadData;
+                // replay conversation so far
+                replayConversation();
+            } else if (state === 0) {
+                runStep();
+            }
+        }
+
+        function close() {
+            isOpen = false;
+            $panel.classList.remove('open');
+            $overlay.classList.remove('active');
+            $fab.classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        async function replayConversation() {
+            // replay all messages up to current state
+            for (let i = 0; i < state; i++) {
+                const step = FLOW[i];
+                if (step.messages.length) {
+                    for (const m of step.messages) await addBotMsg(m);
+                }
+                if (step.field && leadData[step.field]) {
+                    addUserMsg(leadData[step.field]);
+                }
+            }
+            // now run current step
+            runStep();
+        }
+
+        /* -- init -- */
+        function init() {
+            $fab.addEventListener('click', () => isOpen ? close() : open());
+            $closeBtn.addEventListener('click', close);
+            $overlay.addEventListener('click', close);
+
+            document.querySelectorAll('.cta-chatbot').forEach(btn => {
+                btn.addEventListener('click', e => {
+                    e.preventDefault();
+                    open();
+                });
+            });
+        }
+
+        return { init, open, close };
+    })();
+
+    ChatBot.init();
+
     /* ---- Reveal on scroll (IntersectionObserver) ---- */
     const revealTargets = document.querySelectorAll(
         '.feature-card, .testimonial-card, .accordion-item, .pricing-card, .cta-card, .section-header'
