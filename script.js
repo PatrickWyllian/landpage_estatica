@@ -101,6 +101,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const tokenData = decodeToken(TMDB_TOKEN);
     if (tokenData && tokenData.exp * 1000 > Date.now()) {
         switchTab('movie');
+        // Pre-fetch séries em background para carregar instantâneo ao clicar na aba
+        fetchTrending('tv').catch(() => {});
     } else {
         track.innerHTML = `<p style="text-align:center;color:var(--text-muted);padding:40px 0;width:100%;">Token TMDB expirado. Atualize o token.</p>`;
     }
